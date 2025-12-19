@@ -5,7 +5,7 @@ use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 
 fn main() {
-    'shell_loop: loop {
+    loop {
         print!("$ ");
         io::stdout().flush().unwrap();
 
@@ -30,32 +30,32 @@ fn handle_type_command(valid_commands: &[&str], args: &str) {
     match valid_commands.contains(&args) {
         true => println!("{args} is a shell builtin"),
         false => match env::var_os("PATH") {
-            Some(paths) => {
-                for path in env::split_paths(&paths) {
-                    match fs::read_dir(path) {
-                        Ok(results) => {
-                            for result in results {
-                                match result {
-                                    Ok(res) => {
-                                        if res.path().is_file()
-                                            && res.metadata().unwrap().permissions().mode() & 0o111
-                                                != 0
-                                            && res.file_name() == args
-                                        {
-                                            println!("{args} is {}", res.path().to_str().unwrap());
-                                            return;
-                                        }
-                                    }
-                                    Err(_) => println!("Error finding file"),
-                                }
-                            }
+            Some(path_string) => {
+                let paths = env::split_paths(&path_string);
+
+                for path in paths {
+                    let path_dir_read_results = fs::read_dir(path).unwrap();
+                    let found = path_dir_read_results.map(|result| result.unwrap());
+
+                    let mut filtered_found_files = found.filter(|res| {
+                        res.path().is_file()
+                            && res.metadata().unwrap().permissions().mode() & 0o111 != 0
+                    });
+
+                    let maybe_file = filtered_found_files
+                        .nth(0)
+                        .take_if(|res| res.file_name() == args);
+
+                    match maybe_file {
+                        Some(dir) => {
+                            println!("{args} is {}", dir.path().to_str().unwrap());
+                            return;
                         }
-                        Err(_) => println!("Error reading dir"),
+                        None => println!("{args}: not found"),
                     }
                 }
-
-                println!("{args}: not found")
             }
+
             None => println!("PATH not found"),
         },
     }
