@@ -16,7 +16,7 @@ fn main() {
             "echo" => println!("{}", args),
             "type" => match args {
                 "exit" | "echo" | "type" => println!("{args} is a shell builtin"),
-                _ => println!("{}: command not found", args),
+                _ => println!("{}: not found", args),
             },
             _ => println!("{}: command not found", input.trim()),
         }
