@@ -42,7 +42,7 @@ fn handle_type_command(valid_commands: &[&str], args: &str) {
                                                 != 0
                                             && res.file_name() == args
                                         {
-                                            println!("{args} in {:?}", res.path());
+                                            println!("{args} is {}", res.path().to_str().unwrap());
                                             continue;
                                         }
                                     }
