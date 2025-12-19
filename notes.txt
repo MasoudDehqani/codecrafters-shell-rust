@@ -1,0 +1,52 @@
+Every program starts with three open connections:
+- stdin
+- stdout
+- stderr
+They are just byte streams provided by the OS
+By running this:
+println!("hello");
+You are not printing to the screen.
+You are writin bytes to the file descriptor.
+
+
+Buffering:
+Writing to the OS is expensive. Writing one byte at a time is slow.
+
+Instead of writing immediately, they:
+- Collect data in memory (buffer)
+- Send it to the OS in chunks
+
+This is buffering.
+
+Types of buffering:
+- unbuffered
+- line-buffered
+- fully-buffered
+
+
+Stop thinking:
+- “My program prints and reads”
+Start thinking:
+- “My program exchanges bytes with streams controlled by the OS”
+
+
+TTY: Teletype (historical name, still used)
+Today it means:
+“An interactive terminal device controlled by a human”
+Examples:
+- Your terminal window
+- SSH session
+- Linux virtual console
+Not a TTY:
+- Redirected output (> file.txt)
+- A pipe (| another_program)
+- A log file
+
+
+It forces any buffered output to be wrotten to the terminal immediately:
+std::io::stdout().flush().unwrap();
+
+std::io::stdout()
+Returns a handle to the process’s standard output.
+Important detail you probably gloss over: this is buffered, usually line-buffered when attached to a TTY and fully buffered when redirected to a file or pipe.
+Translation: printing doesn’t necessarily show up right away.
