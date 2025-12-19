@@ -5,7 +5,7 @@ use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 
 fn main() {
-    loop {
+    'shell_loop: loop {
         print!("$ ");
         io::stdout().flush().unwrap();
 
@@ -43,7 +43,7 @@ fn handle_type_command(valid_commands: &[&str], args: &str) {
                                             && res.file_name() == args
                                         {
                                             println!("{args} is {}", res.path().to_str().unwrap());
-                                            continue;
+                                            return;
                                         }
                                     }
                                     Err(_) => println!("Error finding file"),
@@ -53,9 +53,10 @@ fn handle_type_command(valid_commands: &[&str], args: &str) {
                         Err(_) => println!("Error reading dir"),
                     }
                 }
+
+                println!("{args}: not found")
             }
-            None => (),
+            None => println!("PATH not found"),
         },
-        false => println!("{args}: not found"),
     }
 }
