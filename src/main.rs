@@ -24,7 +24,7 @@ fn main() {
 
         match command {
             "exit" => break,
-            "echo" => println!("{}", arg),
+            "echo" => println!("{}", args.join(" ").to_string()),
             "type" => handle_type_command(&valid_commands, arg),
             cmd => {
                 exec_cmd(cmd, args);
