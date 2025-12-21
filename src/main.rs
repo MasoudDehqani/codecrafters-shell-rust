@@ -1,8 +1,7 @@
 use std::env;
-use std::fs;
-#[allow(unused_imports)]
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
+use std::path::Path;
 
 fn main() {
     loop {
@@ -12,51 +11,45 @@ fn main() {
         let mut input = String::new();
         io::stdin().read_line(&mut input).unwrap();
 
-        let command = input.split_ascii_whitespace().next().unwrap();
-        let args = input.split_once(command).unwrap().1.trim();
+        let parts: Vec<&str> = input.split_ascii_whitespace().collect();
+        if parts.is_empty() {
+            return;
+        }
+        let command = parts[0];
+        let args = &parts[1..];
+        let arg = args[0];
 
         let valid_commands = ["exit", "echo", "type"];
 
         match command {
             "exit" => break,
-            "echo" => println!("{}", args),
-            "type" => handle_type_command(&valid_commands, args),
+            "echo" => println!("{}", arg),
+            "type" => handle_type_command(&valid_commands, arg),
             _ => println!("{}: command not found", input.trim()),
         }
     }
 }
 
-fn handle_type_command(valid_commands: &[&str], args: &str) {
-    match valid_commands.contains(&args) {
-        true => println!("{args} is a shell builtin"),
-        false => match env::var_os("PATH") {
-            Some(path_string) => {
-                let paths = env::split_paths(&path_string);
+fn is_executable(path: &Path) -> bool {
+    path.metadata()
+        .map(|m| m.is_file() && (m.permissions().mode() & 0o111 != 0))
+        .unwrap_or(false)
+}
 
-                for path in paths {
-                    let path_dir_read_results = fs::read_dir(path).unwrap();
-                    let found = path_dir_read_results.map(|result| result.unwrap());
+fn handle_type_command(valid_commands: &[&str], arg: &str) {
+    if valid_commands.contains(&arg) {
+        println!("{arg} is a shell builtin")
+    } else if let Some(paths_string) = env::var_os("PATH") {
+        let paths = env::split_paths(&paths_string);
 
-                    let mut filtered_found_files = found.filter(|res| {
-                        res.path().is_file()
-                            && res.metadata().unwrap().permissions().mode() & 0o111 != 0
-                    });
-
-                    let maybe_file = filtered_found_files
-                        .nth(0)
-                        .take_if(|res| res.file_name() == args);
-
-                    match maybe_file {
-                        Some(dir) => {
-                            println!("{args} is {}", dir.path().to_str().unwrap());
-                            return;
-                        }
-                        None => println!("{args}: not found"),
-                    }
-                }
+        for path in paths {
+            let candidate = path.join(arg);
+            if candidate.is_file() && is_executable(&candidate) {
+                println!("{arg} is {}", candidate.display());
+                return;
             }
-
-            None => println!("PATH not found"),
-        },
+        }
+    } else {
+        println!("PATH not found")
     }
 }
