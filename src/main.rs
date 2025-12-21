@@ -40,7 +40,7 @@ fn exec_cmd(cmd: &str, args: &[&str]) {
         for path in paths {
             let candidate = path.join(cmd);
             if candidate.is_file() && is_executable(&candidate) {
-                process::Command::new(cmd).args(args).exec();
+                process::Command::new(cmd).args(args).status().unwrap();
                 return;
             }
         }
