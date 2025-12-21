@@ -69,7 +69,7 @@ fn handle_type_command(valid_commands: &[&str], arg: &str) {
             }
         }
 
-        println!("{}: command not found", arg);
+        println!("{}: not found", arg);
     } else {
         println!("PATH not found")
     }
