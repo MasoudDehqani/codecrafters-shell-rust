@@ -37,9 +37,7 @@ fn exec_cmd(cmd: &str, args: &[&str]) {
         for path in paths {
             let candidate = path.join(cmd);
             if candidate.is_file() && is_executable(&candidate) {
-                println!("{:?}", candidate);
-                let output = process::Command::new(cmd).args(args).exec();
-                // println!("{}", String::from_utf8_lossy(&output.stdout));
+                process::Command::new(cmd).args(args).exec();
                 return;
             }
         }
