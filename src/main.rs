@@ -1,5 +1,6 @@
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
+use std::os::unix::process::CommandExt;
 use std::path::Path;
 use std::{env, process};
 
@@ -37,7 +38,7 @@ fn exec_cmd(cmd: &str, args: &[&str]) {
             let candidate = path.join(cmd);
             if candidate.is_file() && is_executable(&candidate) {
                 println!("{:?}", candidate);
-                let output = process::Command::new(cmd).args(args).output().unwrap();
+                let output = process::Command::new(cmd).args(args).exec();
                 // println!("{}", String::from_utf8_lossy(&output.stdout));
                 return;
             }
