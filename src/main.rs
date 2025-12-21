@@ -1,6 +1,5 @@
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
-use std::os::unix::process::CommandExt;
 use std::path::Path;
 use std::{env, process};
 
@@ -18,7 +17,8 @@ fn main() {
         }
         let command = parts[0];
         let args = &parts[1..];
-        let arg = args[0];
+        let mut maybe_arg = args.get(0);
+        let arg = maybe_arg.get_or_insert(&"");
 
         let valid_commands = ["exit", "echo", "type"];
 
