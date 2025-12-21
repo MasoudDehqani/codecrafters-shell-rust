@@ -36,12 +36,14 @@ fn exec_cmd(cmd: &str, args: &[&str]) {
         for path in paths {
             let candidate = path.join(cmd);
             if candidate.is_file() && is_executable(&candidate) {
-                process::Command::new(cmd).args(args).output().unwrap();
+                println!("{:?}", candidate);
+                let output = process::Command::new(cmd).args(args).output().unwrap();
+                println!("{}", String::from_utf8_lossy(&output.stdout));
                 return;
-            } else {
-                println!("{}: command not found", cmd);
             }
         }
+
+        println!("{}: command not found", cmd);
     }
 }
 
