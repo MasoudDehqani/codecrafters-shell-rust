@@ -1,7 +1,7 @@
-use std::env;
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
+use std::{env, process};
 
 fn main() {
     loop {
@@ -25,7 +25,22 @@ fn main() {
             "exit" => break,
             "echo" => println!("{}", arg),
             "type" => handle_type_command(&valid_commands, arg),
-            _ => println!("{}: command not found", input.trim()),
+            cmd => exec_cmd(cmd, args),
+        }
+    }
+}
+
+fn exec_cmd(cmd: &str, args: &[&str]) {
+    if let Some(paths_string) = env::var_os("PATH") {
+        let paths = env::split_paths(&paths_string);
+        for path in paths {
+            let candidate = path.join(cmd);
+            if candidate.is_file() && is_executable(&candidate) {
+                process::Command::new(cmd).args(args).output().unwrap();
+                return;
+            } else {
+                println!("{}: command not found", cmd);
+            }
         }
     }
 }
