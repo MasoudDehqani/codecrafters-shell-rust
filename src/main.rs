@@ -38,7 +38,7 @@ fn exec_cmd(cmd: &str, args: &[&str]) {
             if candidate.is_file() && is_executable(&candidate) {
                 println!("{:?}", candidate);
                 let output = process::Command::new(cmd).args(args).output().unwrap();
-                println!("{}", String::from_utf8_lossy(&output.stdout));
+                // println!("{}", String::from_utf8_lossy(&output.stdout));
                 return;
             }
         }
