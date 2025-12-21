@@ -26,7 +26,10 @@ fn main() {
             "exit" => break,
             "echo" => println!("{}", arg),
             "type" => handle_type_command(&valid_commands, arg),
-            cmd => exec_cmd(cmd, args),
+            cmd => {
+                exec_cmd(cmd, args);
+                continue;
+            }
         }
     }
 }
@@ -38,7 +41,7 @@ fn exec_cmd(cmd: &str, args: &[&str]) {
             let candidate = path.join(cmd);
             if candidate.is_file() && is_executable(&candidate) {
                 process::Command::new(cmd).args(args).exec();
-                continue;
+                return;
             }
         }
 
