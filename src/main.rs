@@ -38,7 +38,7 @@ fn exec_cmd(cmd: &str, args: &[&str]) {
             let candidate = path.join(cmd);
             if candidate.is_file() && is_executable(&candidate) {
                 process::Command::new(cmd).args(args).exec();
-                return;
+                continue;
             }
         }
 
