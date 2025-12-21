@@ -66,10 +66,10 @@ fn handle_type_command(valid_commands: &[&str], arg: &str) {
             if candidate.is_file() && is_executable(&candidate) {
                 println!("{arg} is {}", candidate.display());
                 return;
-            } else {
-                println!("{}: command not found", arg);
             }
         }
+
+        println!("{}: command not found", arg);
     } else {
         println!("PATH not found")
     }
