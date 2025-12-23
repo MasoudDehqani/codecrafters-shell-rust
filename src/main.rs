@@ -27,7 +27,7 @@ fn main() {
             "echo" => println!("{}", args.join(" ").to_string()),
             "pwd" => {
                 let working_directory = match std::env::current_dir() {
-                    Ok(curr) => curr,
+                    Ok(wd) => wd,
                     Err(e) => {
                         eprintln!("Error reading working directory: {e}");
                         continue;
