@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
-use std::{env, process};
+use std::{env, fs, process};
 
 fn main() {
     loop {
@@ -25,6 +25,10 @@ fn main() {
         match command {
             "exit" => break,
             "echo" => println!("{}", args.join(" ").to_string()),
+            "pwd" => {
+                let working_directory = std::env::current_dir().unwrap();
+                println!("{}", working_directory.to_str().unwrap())
+            }
             "type" => handle_type_command(&valid_commands, arg),
             cmd => {
                 exec_cmd(cmd, args);
