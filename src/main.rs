@@ -26,8 +26,15 @@ fn main() {
             "exit" => break,
             "echo" => println!("{}", args.join(" ").to_string()),
             "pwd" => {
-                let working_directory = std::env::current_dir().unwrap();
-                println!("{}", working_directory.to_str().unwrap())
+                let working_directory = match std::env::current_dir() {
+                    Ok(curr) => curr,
+                    Err(e) => {
+                        eprintln!("Error reading working directory: {e}");
+                        continue;
+                    }
+                };
+
+                println!("{}", working_directory.display())
             }
             "type" => handle_type_command(&valid_commands, arg),
             cmd => {
