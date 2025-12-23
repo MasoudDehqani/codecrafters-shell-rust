@@ -20,7 +20,7 @@ fn main() {
         let mut maybe_arg = args.get(0);
         let arg = maybe_arg.get_or_insert(&"");
 
-        let valid_commands = ["exit", "echo", "type"];
+        let valid_commands = ["exit", "echo", "type", "pwd"];
 
         match command {
             "exit" => break,
