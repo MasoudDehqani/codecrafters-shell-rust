@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
-use std::{env, fs, process};
+use std::{env, process};
 
 fn main() {
     loop {
@@ -20,11 +20,15 @@ fn main() {
         let mut maybe_arg = args.get(0);
         let arg = maybe_arg.get_or_insert(&"");
 
-        let valid_commands = ["exit", "echo", "type", "pwd"];
+        let valid_commands = ["exit", "echo", "type", "pwd", "cd"];
 
         match command {
             "exit" => break,
             "echo" => println!("{}", args.join(" ").to_string()),
+            "cd" => match env::set_current_dir(&arg) {
+                Ok(_) => (),
+                Err(_) => println!("cd: {arg}: No such file or directory"),
+            },
             "pwd" => {
                 let working_directory = match std::env::current_dir() {
                     Ok(wd) => wd,
