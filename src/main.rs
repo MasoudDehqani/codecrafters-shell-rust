@@ -25,10 +25,17 @@ fn main() {
         match command {
             "exit" => break,
             "echo" => println!("{}", args.join(" ").to_string()),
-            "cd" => match env::set_current_dir(&arg) {
-                Ok(_) => (),
-                Err(_) => println!("cd: {arg}: No such file or directory"),
-            },
+            "cd" => {
+                if **arg == "~" {
+                    let home_dir = env::home_dir().unwrap();
+                    env::set_current_dir(home_dir).unwrap();
+                } else {
+                    match env::set_current_dir(&arg) {
+                        Ok(_) => (),
+                        Err(_) => println!("cd: {arg}: No such file or directory"),
+                    }
+                }
+            }
             "pwd" => {
                 let working_directory = match std::env::current_dir() {
                     Ok(wd) => wd,
