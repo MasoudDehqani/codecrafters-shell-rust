@@ -26,15 +26,8 @@ fn main() {
             "exit" => break,
             "echo" => println!("{}", args.join(" ").to_string()),
             "cd" => {
-                if **arg == "~" {
-                    let home_dir = env::home_dir().unwrap();
-                    env::set_current_dir(home_dir).unwrap();
-                } else {
-                    match env::set_current_dir(&arg) {
-                        Ok(_) => (),
-                        Err(_) => println!("cd: {arg}: No such file or directory"),
-                    }
-                }
+                handle_cd_cmd(arg);
+                continue;
             }
             "pwd" => {
                 let working_directory = match std::env::current_dir() {
@@ -52,6 +45,28 @@ fn main() {
                 exec_cmd(cmd, args);
                 continue;
             }
+        }
+    }
+}
+
+fn handle_cd_cmd(arg: &str) {
+    if arg == "~" {
+        let home_dir = match env::home_dir() {
+            Some(h) => h,
+            None => {
+                println!("Error finding home directory");
+                return;
+            }
+        };
+
+        match env::set_current_dir(home_dir) {
+            Ok(_) => (),
+            Err(_) => println!("Error navigating to home directory"),
+        }
+    } else {
+        match env::set_current_dir(&arg) {
+            Ok(_) => (),
+            Err(_) => println!("cd: {arg}: No such file or directory"),
         }
     }
 }
